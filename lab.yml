@@ -62,10 +62,7 @@
         # NFS cluster nodes
         10.0.0.6 nfs-0
         10.0.0.7 nfs-1
-        # SBD nodes
-        10.0.0.17 sbd-0
-        10.0.0.18 sbd-1
-        10.0.0.19 sbd-2
+
 
 - name: Push SSH config
   hosts: all
@@ -112,7 +109,7 @@
       mode: '0644'
 
 - name: Configure SBD VMs
-  hosts: sbd
+  hosts: bastion
   remote_user: azureadmin
   become: yes
   tasks:
@@ -183,8 +180,7 @@
 
   - name: Load softdog module
     command: sudo modprobe -v softdog
-#  - name: Zypper update
-#    command: sudo zypper up -y --skip-interactive
+
   - name: Install socat
     zypper:
       name: socat
