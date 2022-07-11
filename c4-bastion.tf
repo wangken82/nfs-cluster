@@ -16,16 +16,9 @@ resource "azurerm_network_interface" "bastion" {
         name                          = "bastion-public"
         subnet_id                     = azurerm_subnet.mysubnet.id
         private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.0.101"
+        private_ip_address            = "10.30.0.100"
         public_ip_address_id          = azurerm_public_ip.bastion.id
         primary                       = "true"
-    }
-
-    ip_configuration {
-        name                          = "bastion-private"
-        subnet_id                     = azurerm_subnet.mysubnet.id
-        private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.0.100"
     }
 }
 

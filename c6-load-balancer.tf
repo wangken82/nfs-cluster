@@ -6,14 +6,14 @@ resource "azurerm_lb" "lb" {
 
   frontend_ip_configuration {
     name                 = "nw1-frontend"
-    private_ip_address   = "10.0.0.4"
+    private_ip_address   = "10.30.0.4"
     private_ip_address_allocation = "Static"
     subnet_id            = azurerm_subnet.mysubnet.id
   }
 
   frontend_ip_configuration {
     name                 = "nw2-frontend"
-    private_ip_address   = "10.0.0.5"
+    private_ip_address   = "10.30.0.5"
     private_ip_address_allocation = "Static"
     subnet_id            = azurerm_subnet.mysubnet.id
   }

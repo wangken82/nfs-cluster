@@ -29,8 +29,8 @@
       state: present
       block: |
         alias bastion='ssh -i ~/.ssh/lab_rsa azureadmin@`terraform output -raw bastion_ip`'
-        alias tunnel-0='ssh -L 8080:10.0.0.6:9664 -i ~/.ssh/lab_rsa azureadmin@`terraform output -raw bastion_ip`'
-        alias tunnel-1='ssh -L 8080:10.0.0.7:9664 -i ~/.ssh/lab_rsa azureadmin@`terraform output -raw bastion_ip`'
+        alias tunnel-0='ssh -L 8080:10.30.0.6:9664 -i ~/.ssh/lab_rsa azureadmin@`terraform output -raw bastion_ip`'
+        alias tunnel-1='ssh -L 8080:10.30.0.7:9664 -i ~/.ssh/lab_rsa azureadmin@`terraform output -raw bastion_ip`'
         ANSIBLE_STDOUT_CALLBACK=debug
   - name: Waiting VMs up and running
     pause:
@@ -57,11 +57,11 @@
       state: present
       block: |
         # IP address of the load balancer frontend configuration for NFS
-        10.0.0.4 nw1-nfs
-        10.0.0.5 nw2-nfs
+        10.30.0.4 nw1-nfs
+        10.30.0.5 nw2-nfs
         # NFS cluster nodes
-        10.0.0.6 nfs-0
-        10.0.0.7 nfs-1
+        10.30.0.6 nfs-0
+        10.30.0.7 nfs-1
 
 
 - name: Push SSH config
@@ -70,11 +70,15 @@
   remote_user: azureadmin
   tasks:
   - name: Push SSH config to all VMs
-    copy:
-      src: ssh.config/ssh.config
-      dest: /home/azureadmin/.ssh/config
+    blockinfile:
+      path: /home/azureadmin/.ssh/config
       owner: azureadmin
       group: users
+      create: yes
+      block: |
+        Host *
+          StrictHostKeyChecking no
+          UserKnownHostsFile=/dev/null
 
 - name: Push root SSH keys to nfs hosts
   hosts: nfs
@@ -108,7 +112,7 @@
       group: root
       mode: '0644'
 
-- name: Configure SBD VMs
+- name: Configure SBD on Bastion VM
   hosts: bastion
   remote_user: azureadmin
   become: yes
@@ -125,7 +129,7 @@
     service:
       name: targetcli
       state: started
-  - name: Create /sbd directory if it does not exist
+  - name: Create /sbd directory
     file:
       path: /sbd
       state: directory
@@ -204,14 +208,12 @@
         vm.dirty_bytes = 629145600
         vm.dirty_background_bytes = 314572800
 
-  - name: Configure interface
-    run_once: true
-    copy:
-      src: nfs.config/nfs.interface.config
-      dest: /etc/sysconfig/network/ifcfg-eth0
-      owner: root
-      group: root  
-      mode: '0644'
+  - name: Configure interface for cloud
+    lineinfile:
+      path: /etc/sysconfig/network/ifcfg-eth0
+      regexp: '^CLOUD_NETCONFIG_MANAGE='
+      line: CLOUD_NETCONFIG_MANAGE='no'
+
   - name: Install fence-agents
     zypper:
       name: fence-agents
@@ -274,7 +276,7 @@
       creates: /etc/corosync/corosync.conf
       responses:
         'Do you want to continue anyway (y/n)?': 'y'
-        '  IP address or hostname of existing node': '10.0.0.6'
+        '  IP address or hostname of existing node': '10.30.0.6'
         '/root/.ssh/id_rsa already exists - overwrite (y/n)?': 'n'
         '  Address for ring0': ''
       timeout: 300
@@ -300,17 +302,17 @@
       state: present
       block: |
         # IP address of the first cluster node
-        10.0.0.6 nfs-0
+        10.30.0.6 nfs-0
         # IP address of the second cluster node
-        10.0.0.7 nfs-1
+        10.30.0.7 nfs-1
         # IP address of the load balancer frontend configuration for NFS
-        10.0.0.4 nw1-nfs
-        10.0.0.5 nw2-nfs
+        10.30.0.4 nw1-nfs
+        10.30.0.5 nw2-nfs
   - name: Create /srv/nfs/ directory if it does not exist
     file:
       path: /srv/nfs/
       state: directory
-  - name: Create the root NFS export entry
+  - name: Create root NFS export entry
     lineinfile:
       dest: /etc/exports
       line: "/srv/nfs/ *(rw,no_root_squash,fsid=0)"
@@ -358,11 +360,11 @@
     script: nfs.config/nfs.drdb2.config.sh
     args:
       creates: /etc/delete.to.retry.drdb.create
-  - name: Add the NFS drbd devices for SAP system NW1 to the cluster configuration
+  - name: Add NFS drbd devices for SAP system NW1 to the cluster configuration
     script: nfs.config/drdb.cluster1.config.sh
     args:
       creates: /etc/delete.to.retry.drdb.cluster1.config.sh
-  - name: Add the NFS drbd devices for SAP system NW2 to the cluster configuration
+  - name: Add NFS drbd devices for SAP system NW2 to the cluster configuration
     script: nfs.config/drdb.cluster2.config.sh
     args:
       creates: /etc/delete.to.retry.drdb.cluster2.config.sh
