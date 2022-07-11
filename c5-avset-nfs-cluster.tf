@@ -16,7 +16,7 @@ resource "azurerm_network_interface" "nfs-0" {
         name                          = "nfs-0-private"
         subnet_id                     = azurerm_subnet.mysubnet.id
         private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.0.6"
+        private_ip_address            = "10.30.0.6"
         primary                       = "true"
     }
 }
@@ -29,7 +29,7 @@ resource "azurerm_network_interface" "nfs-1" {
         name                          = "nfs-1-private"
         subnet_id                     = azurerm_subnet.mysubnet.id
         private_ip_address_allocation = "Static"
-        private_ip_address            = "10.0.0.7"
+        private_ip_address            = "10.30.0.7"
         primary                       = "true"
     }
 }
