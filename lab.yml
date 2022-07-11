@@ -6,13 +6,9 @@
     openssh_keypair:
       path: ~/.ssh/lab_rsa
   - name: Copy SSH config to localhost
-    blockinfile:
-      path: ~/.ssh/config
-      create: yes
-      block: |
-        Host *
-          StrickHostKeyChecking no
-          UserKnownHostsFile=/dev/null
+    copy:
+      src: ssh.config/ssh.config
+      dest: ~/.ssh/config
   - name: Get my public IP
     ipify_facts:
       timeout: 20
