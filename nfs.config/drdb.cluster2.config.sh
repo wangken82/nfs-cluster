@@ -25,7 +25,7 @@ sudo crm configure primitive exportfs_NW2 \
 
 sudo crm configure primitive vip_NW2_nfs \
   IPaddr2 \
-  params ip=10.0.0.5 cidr_netmask=24 op monitor interval=10 timeout=20
+  params ip=10.30.0.5 cidr_netmask=24 op monitor interval=10 timeout=20
 
 sudo crm configure primitive nc_NW2_nfs azure-lb port=61001
 
