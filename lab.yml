@@ -2,6 +2,10 @@
   hosts: localhost
   connection: local
   tasks:
+  - name: Create ssh folder in cloudshell
+    file:
+      path: ~/.ssh
+      state: directory
   - name: Generate SSH keys
     openssh_keypair:
       path: ~/.ssh/lab_rsa
