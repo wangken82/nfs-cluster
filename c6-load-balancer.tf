@@ -36,7 +36,6 @@ resource "azurerm_network_interface_backend_address_pool_association" "lb-1" {
 }
 
 resource "azurerm_lb_probe" "lb-nw1" {
-  resource_group_name = azurerm_resource_group.myrg.name
   loadbalancer_id     = azurerm_lb.lb.id
   name                = "nw1-hp"
   port                = "61000"
@@ -45,7 +44,6 @@ resource "azurerm_lb_probe" "lb-nw1" {
   protocol            = "Tcp"
 }
 resource "azurerm_lb_probe" "lb-nw2" {
-  resource_group_name = azurerm_resource_group.myrg.name
   loadbalancer_id     = azurerm_lb.lb.id
   name                = "nw2-hp"
   port                = "61001"
@@ -55,53 +53,45 @@ resource "azurerm_lb_probe" "lb-nw2" {
 }
 
 resource "azurerm_lb_rule" "lb-0" {
-  resource_group_name            = azurerm_resource_group.myrg.name
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "nw1-lb-2049-0"
   protocol                       = "Tcp"
   frontend_port                  = 2049
   backend_port                   = 2049
   frontend_ip_configuration_name = "nw1-frontend"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.lb.id
   enable_floating_ip             = "true"
   idle_timeout_in_minutes        = "30"
   probe_id                       = azurerm_lb_probe.lb-nw1.id
 }
 resource "azurerm_lb_rule" "lb-1" {
-  resource_group_name            = azurerm_resource_group.myrg.name
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "nw1-lb-2049-1"
   protocol                       = "Udp"
   frontend_port                  = 2049
   backend_port                   = 2049
   frontend_ip_configuration_name = "nw1-frontend"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.lb.id
   enable_floating_ip             = "true"
   idle_timeout_in_minutes        = "30"
   probe_id                       = azurerm_lb_probe.lb-nw1.id
 }
 resource "azurerm_lb_rule" "lb-2" {
-  resource_group_name            = azurerm_resource_group.myrg.name
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "nw1-lb-2049-2"
   protocol                       = "Tcp"
   frontend_port                  = 2049
   backend_port                   = 2049
   frontend_ip_configuration_name = "nw2-frontend"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.lb.id
   enable_floating_ip             = "true"
   idle_timeout_in_minutes        = "30"
   probe_id                       = azurerm_lb_probe.lb-nw2.id
 }
 resource "azurerm_lb_rule" "lb-3" {
-  resource_group_name            = azurerm_resource_group.myrg.name
   loadbalancer_id                = azurerm_lb.lb.id
   name                           = "nw1-lb-2049-3"
   protocol                       = "Udp"
   frontend_port                  = 2049
   backend_port                   = 2049
   frontend_ip_configuration_name = "nw2-frontend"
-  backend_address_pool_id        = azurerm_lb_backend_address_pool.lb.id
   enable_floating_ip             = "true"
   idle_timeout_in_minutes        = "30"
   probe_id                       = azurerm_lb_probe.lb-nw2.id

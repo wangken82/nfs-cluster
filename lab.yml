@@ -19,10 +19,12 @@
     delegate_to: localhost
   - name: output cloudshell public_ip
     debug: msg="my cloudshell public ip is {{ ipify_public_ip }}"
+  
   - name: Terraform apply
     terraform:
       lock: no
       force_init: true
+      provider_upgrade: true
       variables:
         cloudshell_public_ip: "{{ ipify_public_ip }}"
       project_path: './'
